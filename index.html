@@ -711,7 +711,7 @@ function openSchool(id){
    <label>Hoort bij</label><div>${goalBox("1")}${goalBox("2")}</div>
    ${(s.vragen&&s.vragen.length)?`<label>Kijkvragen <span class="muted edit-only">(vink af wat je beantwoord hebt)</span></label>${s.vragen.map((q,i)=>`<label class="qline"><input type="checkbox" data-q="${i}" ${(s.qdone||[]).includes(i)?"checked":""}><span><span class="chip ${q[0]==="1"?"m":"b"}">Doel ${q[0]}</span>${esc(q[1])}</span></label>`).join("")}`:""}
    <label>Wat viel op</label><textarea data-f="obs" placeholder="2–3 punten…">${esc(s.obs||"")}</textarea>
-   <label class="${s.photo?"":"edit-only"}">Foto van een slim ingericht lokaal</label>
+   <label class="${s.photo?"":"edit-only"}">Foto's ter inspiratie</label>
    <div class="note-tip edit-only">Geen herkenbare kinderen op foto's. Vraag bij twijfel toestemming aan de school.</div>
    <input type="file" accept="image/*" id="dPhoto" class="edit-only">
    ${s.photo?`<img class="photo" src="${s.photo}" alt="">`:""}
