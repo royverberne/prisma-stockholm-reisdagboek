@@ -89,7 +89,7 @@ input:focus,select:focus,textarea:focus{outline:3px solid var(--cyan);border-col
 .mk{width:100%;height:100%;border-radius:50%;background:#9aa0b5;color:#fff;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;cursor:pointer}
 .mk.v{background:var(--magenta)}
 .mk.h{background:var(--indigo);font-size:14px}
-.mk.e{background:var(--orange);font-size:13px;border-width:2px}
+.mk.e{background:var(--orange);font-size:15px;border-width:2px}
 .legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .dot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:5px}
 .pin{cursor:pointer}
@@ -623,9 +623,9 @@ function renderMapSvg(){
 /* ---------- echte kaart (Leaflet + OpenStreetMap) ---------- */
 const POIS=[
  {id:"hotel",k:"h",t:"Best Western Kom Hotel",a:"Döbelnsgatan 17, Stockholm",lat:59.3414,lng:18.0565},
- {id:"trotzig",k:"e",t:"Diner dag 1 · Martien Trotzig",a:"Västerlanggatan 79, Stockholm",lat:59.3236,lng:18.0706},
- {id:"basta",k:"e",t:"Diner dag 2 · BASTA!",a:"Mäster Samuelsgatan 59, Stockholm",lat:59.3328,lng:18.0630},
- {id:"knut",k:"e",t:"Diner dag 3 · Knut",a:"Upplandsgatan 17, Stockholm",lat:59.3405,lng:18.0460}
+ {id:"trotzig",k:"e",n:1,t:"Diner dag 1 · Martien Trotzig",a:"Västerlanggatan 79, Stockholm",lat:59.3236,lng:18.0706},
+ {id:"basta",k:"e",n:2,t:"Diner dag 2 · BASTA!",a:"Mäster Samuelsgatan 59, Stockholm",lat:59.3328,lng:18.0630},
+ {id:"knut",k:"e",n:3,t:"Diner dag 3 · Knut",a:"Upplandsgatan 17, Stockholm",lat:59.3405,lng:18.0460}
 ];
 let MAP=null,LAYER=null;
 const poiPos=p=>{const g=(S.geo||{})[p.id];return g?[g.lat,g.lng]:[p.lat,p.lng]};
@@ -646,7 +646,7 @@ function renderMap(){
   POIS.forEach(p=>{
     if(p.k==="e"&&!$("#showEat").checked)return;
     const c=poiPos(p);
-    L.marker(c,{icon:p.k==="h"?mkIcon("h","H",32):mkIcon("e","🍽",26),title:p.t,zIndexOffset:p.k==="h"?500:0})
+    L.marker(c,{icon:p.k==="h"?mkIcon("h","H",32):mkIcon("e",p.n||"",30),title:p.t,zIndexOffset:p.k==="h"?500:0})
      .bindPopup("<b>"+esc(p.t)+"</b><br>"+esc(p.a)+'<br><a href="'+gmaps(c[0],c[1])+'" target="_blank" rel="noopener">Open in Google Maps ↗</a>').addTo(LAYER);
   });
   S.schools.forEach((s,i)=>{
