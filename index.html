@@ -125,6 +125,7 @@ dialog{border:0;border-radius:20px;padding:0;width:min(720px,94vw);max-height:92
 dialog::backdrop{background:rgba(30,30,70,.55)}
 .dlg{padding:22px;overflow:auto;max-height:92vh}
 .photo{width:100%;max-height:300px;object-fit:cover;border-radius:12px;margin-top:8px}
+.pfig{margin:0 0 10px}.pfig input{margin-top:6px}.pfig button{margin-top:6px}
 .rate button{font-size:1.6rem;background:none;border:0;cursor:pointer;color:#ccc;padding:0 2px}
 .rate button.on{color:var(--yellow)}
 
@@ -397,9 +398,10 @@ const QUESTIONS={
 let S=load();
 function blank(){return{group:"2",schools:[],notes:[],out:{},exp:{},prismaGevoel:"",geo:{},seed2:false}}
 function ensureSeed(s){
+  (s.schools||[]).forEach(x=>{if(!Array.isArray(x.photos))x.photos=[];if(x.photo){x.photos.unshift({u:x.photo,c:x.cap||""});}delete x.photo;delete x.cap});
   if(!s.seed2){
     s.schools=(s.schools||[]).filter(x=>!x.demo);s.notes=(s.notes||[]).filter(x=>!x.demo);
-    SEED.forEach(d=>{if(!s.schools.some(x=>x.id===d.id))s.schools.push(Object.assign({visited:false,goals:[],obs:"",trans:"",rating:0,photo:"",cap:""},d))});
+    SEED.forEach(d=>{if(!s.schools.some(x=>x.id===d.id))s.schools.push(Object.assign({visited:false,goals:[],obs:"",trans:"",rating:0,photos:[]},d))});
     if(!s.group)s.group="2";
     s.seed2=true;
   }
@@ -432,12 +434,14 @@ function save(){
 function banner(html){const b=$("#banner");b.innerHTML=html;b.classList.add("on")}
 async function syncPhotos(){
   for(const s of S.schools){
-    if(s.photo&&s.photo.startsWith("data:")){
-      const id=uid()+uid();
-      const r=await fetch("/api/photo",{method:"POST",headers:{"content-type":"application/json","x-edit-key":EDITKEY},body:JSON.stringify({id,data:s.photo})});
-      if(!r.ok)throw new Error("foto "+r.status);
-      s.photo=(await r.json()).url;
-      try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+    for(const p of (s.photos||[])){
+      if(p.u&&p.u.startsWith("data:")){
+        const id=uid()+uid();
+        const r=await fetch("/api/photo",{method:"POST",headers:{"content-type":"application/json","x-edit-key":EDITKEY},body:JSON.stringify({id,data:p.u})});
+        if(!r.ok)throw new Error("foto "+r.status);
+        p.u=(await r.json()).url;
+        try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+      }
     }
   }
 }
@@ -711,11 +715,10 @@ function openSchool(id){
    <label>Hoort bij</label><div>${goalBox("1")}${goalBox("2")}</div>
    ${(s.vragen&&s.vragen.length)?`<label>Kijkvragen <span class="muted edit-only">(vink af wat je beantwoord hebt)</span></label>${s.vragen.map((q,i)=>`<label class="qline"><input type="checkbox" data-q="${i}" ${(s.qdone||[]).includes(i)?"checked":""}><span><span class="chip ${q[0]==="1"?"m":"b"}">Doel ${q[0]}</span>${esc(q[1])}</span></label>`).join("")}`:""}
    <label>Wat viel op</label><textarea data-f="obs" placeholder="2–3 punten…">${esc(s.obs||"")}</textarea>
-   <label class="${s.photo?"":"edit-only"}">Foto's ter inspiratie</label>
+   <label class="${(s.photos||[]).length?"":"edit-only"}">Foto's ter inspiratie</label>
    <div class="note-tip edit-only">Geen herkenbare kinderen op foto's. Vraag bij twijfel toestemming aan de school.</div>
-   <input type="file" accept="image/*" id="dPhoto" class="edit-only">
-   ${s.photo?`<img class="photo" src="${s.photo}" alt="">`:""}
-   <input type="text" data-f="cap" value="${esc(s.cap||"")}" placeholder="Bijschrift" style="margin-top:8px">
+   <input type="file" accept="image/*" multiple id="dPhoto" class="edit-only">
+   <div id="dPhotos">${(s.photos||[]).map((p,i)=>`<figure class="pfig"><a href="${esc(p.u)}" target="_blank" rel="noopener"><img class="photo" src="${esc(p.u)}" alt=""></a><input type="text" data-pc="${i}" value="${esc(p.c||"")}" placeholder="Bijschrift"><button type="button" class="btn danger sm edit-only" data-pdel="${i}">Foto verwijderen</button></figure>`).join("")}</div>
    <label>Vertaling naar onze school</label><textarea data-f="trans" placeholder="Wat kan ik morgen al doen?">${esc(s.trans||"")}</textarea>
    <label>Hoeveel wil ik dit overnemen?</label>
    <div class="rate" id="dRate">${[1,2,3,4,5].map(n=>`<button data-r="${n}" class="${(s.rating||0)>=n?"on":""}">★</button>`).join("")}</div>
@@ -724,7 +727,7 @@ function openSchool(id){
   if(!isEd()){
     lockAll(dlg);
     dlg.querySelectorAll("textarea").forEach(t=>{if(!t.value.trim()){t.style.display="none";const l=t.previousElementSibling;if(l&&l.tagName==="LABEL")l.style.display="none"}});
-    const cp=dlg.querySelector('[data-f="cap"]');if(cp&&!cp.value.trim())cp.style.display="none";
+    dlg.querySelectorAll("[data-pc]").forEach(c=>{if(!c.value.trim())c.style.display="none"});
   }
   dlg.querySelectorAll("[data-f]").forEach(el=>{
     const h=()=>{
@@ -747,11 +750,18 @@ function openSchool(id){
   };
   $("#dClose").onclick=()=>dlg.close();
   $("#dDel").onclick=()=>{if(confirm("Deze school en bijbehorende reflectie verwijderen?")){S.schools=S.schools.filter(x=>x.id!==id);S.notes.forEach(n=>{if(n.school===id)n.school=""});save();dlg.close();renderAll()}};
-  $("#dPhoto").onchange=ev=>{const f=ev.target.files[0];if(!f)return;shrink(f,900,.72).then(u=>{s.photo=u;save();openSchool(id)})};
+  dlg.querySelectorAll("[data-pc]").forEach(el=>el.addEventListener("input",()=>{const p=s.photos[+el.dataset.pc];if(p){p.c=el.value;save()}}));
+  dlg.querySelectorAll("[data-pdel]").forEach(b=>b.onclick=()=>{if(!confirm("Deze foto verwijderen?"))return;s.photos.splice(+b.dataset.pdel,1);save();openSchool(id)});
+  $("#dPhoto").onchange=async ev=>{
+    const files=[...ev.target.files];if(!files.length)return;
+    s.photos=s.photos||[];
+    for(const f of files){try{s.photos.push({u:await shrink(f,900,.72),c:""})}catch(e){}}
+    save();openSchool(id);
+  };
   if(!dlg.open)dlg.showModal();
 }
 function shrink(file,max,q){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement("canvas");c.width=im.width*k;c.height=im.height*k;c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",q))};im.src=r.result};r.readAsDataURL(file)})}
-$("#addSchool").onclick=()=>{const s={id:uid(),name:"",district:"norrmalm",date:"",type:"",visited:false,goals:[],obs:"",trans:"",rating:0,photo:"",cap:""};S.schools.push(s);save();renderAll();openSchool(s.id)};
+$("#addSchool").onclick=()=>{const s={id:uid(),name:"",district:"norrmalm",date:"",type:"",visited:false,goals:[],obs:"",trans:"",rating:0,photos:[]};S.schools.push(s);save();renderAll();openSchool(s.id)};
 $("#clearDemo").onclick=()=>{S.schools=S.schools.filter(s=>!s.demo);S.notes=S.notes.filter(n=>!n.demo);save();renderAll()};
 
 /* ---------- notes ---------- */
