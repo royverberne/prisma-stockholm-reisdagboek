@@ -622,7 +622,7 @@ function renderMap(){
   if(!MAP){
     box.innerHTML="";box.classList.add("live");
     MAP=L.map(box,{scrollWheelZoom:false}).setView([59.3293,18.0686],12);
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:19,attribution:"&copy; OpenStreetMap-bijdragers &copy; CARTO"}).addTo(MAP);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"&copy; OpenStreetMap-bijdragers"}).addTo(MAP);
     LAYER=L.layerGroup().addTo(MAP);
   }
   LAYER.clearLayers();
