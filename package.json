@@ -1,0 +1,10 @@
+{
+  "name": "prisma-stockholm-reisdagboek",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "22.x" },
+  "dependencies": {
+    "@vercel/blob": "^2.8.2"
+  }
+}
