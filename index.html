@@ -642,6 +642,10 @@ let MAP=null,LAYER=null;
 const poiPos=p=>{const g=(S.geo||{})[p.id];return g?[g.lat,g.lng]:[p.lat,p.lng]};
 function schoolPos(s,i){if(s.lat!=null&&s.lng!=null)return[s.lat,s.lng];const d=DISTRICTS[s.district]||DISTRICTS.overig;return[d.lat+((i%3)-1)*0.0025,d.lng+Math.floor(i/3)*0.0025]}
 const gmaps=(a,b)=>"https://www.google.com/maps/search/?api=1&query="+a+","+b;
+// Zoek op naam en adres, zodat Google Maps de plek zelf toont (niet alleen de coördinaten)
+const gmapsQ=q=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(/stockholm/i.test(q)?q:q+", Stockholm");
+const schoolQ=s=>[s.name,s.addr].filter(Boolean).join(", ");
+const poiQ=p=>p.t.replace(/^Diner dag \d · /,"")+", "+p.a;
 function mkIcon(cls,txt,sz){return L.divIcon({className:"mkwrap",html:'<div class="mk '+cls+'">'+txt+'</div>',iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]})}
 function mapPoints(){const pts=S.schools.map((s,i)=>schoolPos(s,i));POIS.forEach(p=>{if(p.k==="h"||$("#showEat").checked)pts.push(poiPos(p))});return pts}
 function renderMap(){
@@ -658,7 +662,7 @@ function renderMap(){
     if(p.k==="e"&&!$("#showEat").checked)return;
     const c=poiPos(p);
     L.marker(c,{icon:p.k==="h"?mkIcon("h","H",32):mkIcon("e",p.n||"",30),title:p.t,zIndexOffset:p.k==="h"?500:0})
-     .bindPopup("<b>"+esc(p.t)+"</b><br>"+esc(p.a)+'<br><a href="'+gmaps(c[0],c[1])+'" target="_blank" rel="noopener">Open in Google Maps ↗</a>').addTo(LAYER);
+     .bindPopup("<b>"+esc(p.t)+"</b><br>"+esc(p.a)+'<br><a href="'+esc(gmapsQ(poiQ(p)))+'" target="_blank" rel="noopener">Open in Google Maps ↗</a>').addTo(LAYER);
   });
   S.schools.forEach((s,i)=>{
     const c=schoolPos(s,i);
@@ -722,7 +726,7 @@ function openSchool(id){
    ${s.info?`<div class="note-tip" style="background:#eef7fc;border-left-color:var(--blue)">${esc(s.info)}${s.time?"<br><b>Programma:</b> "+esc(s.time):""}</div>`:""}
    <label class="edit-only">Adres <span class="muted">(voor de kaart)</span></label>
    <div class="row edit-only"><input type="text" data-f="addr" value="${esc(s.addr||"")}" placeholder="bijv. Katarina Bangata 41, Stockholm" style="flex:1;min-width:200px"><button class="btn sec sm" id="dGeo" type="button">📍 Zoek op kaart</button></div>
-   <div class="muted" id="dGeoMsg">${s.lat!=null?`<a href="${gmaps(s.lat,s.lng)}" target="_blank" rel="noopener">Open in Google Maps ↗</a>`:(isEd()?"Nog geen locatie: vul een adres in en klik op zoeken.":"")}</div>
+   <div class="muted" id="dGeoMsg">${(s.name||s.addr)?`<a href="${esc(gmapsQ(schoolQ(s)))}" target="_blank" rel="noopener">Open in Google Maps ↗</a>`:(isEd()?"Nog geen locatie: vul een adres in en klik op zoeken.":"")}</div>
    <div class="grid g3">
     <div><label>Wijk</label><select data-f="district">${Object.entries(DISTRICTS).map(([k,v])=>`<option value="${k}" ${s.district===k?"selected":""}>${v.n}</option>`).join("")}</select></div>
     <div><label>Datum</label><input type="date" data-f="date" value="${esc(s.date||"")}"></div>
@@ -762,7 +766,7 @@ function openSchool(id){
     const q=(s.addr||s.name||"").trim();if(!q)return;
     const m=$("#dGeoMsg");m.textContent="Zoeken…";
     const r=await geocode(q.toLowerCase().includes("stockholm")?q:q+", Stockholm");
-    if(r&&!r.err){s.lat=r.lat;s.lng=r.lng;s.geoDone=true;save();renderMap();if(MAP)MAP.setView([r.lat,r.lng],15);m.innerHTML='Gevonden. <a href="'+gmaps(r.lat,r.lng)+'" target="_blank" rel="noopener">Open in Google Maps ↗</a>'}
+    if(r&&!r.err){s.lat=r.lat;s.lng=r.lng;s.geoDone=true;save();renderMap();if(MAP)MAP.setView([r.lat,r.lng],15);m.innerHTML='Gevonden. <a href="'+esc(gmapsQ(schoolQ(s)))+'" target="_blank" rel="noopener">Open in Google Maps ↗</a>'}
     else m.textContent=r&&r.err?"Geen verbinding om te zoeken.":"Niet gevonden. Probeer een volledig adres."
   };
   $("#dClose").onclick=()=>dlg.close();
