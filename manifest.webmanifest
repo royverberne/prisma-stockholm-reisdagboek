@@ -1,0 +1,12 @@
+{
+  "name": "Mijn POP Stockholm",
+  "short_name": "POP Stockholm",
+  "description": "Persoonlijk ontwikkelplan van Meester Roy voor de Prisma Erasmus+ studiereis naar Stockholm.",
+  "lang": "nl", "start_url": "./", "scope": "./", "display": "standalone",
+  "background_color": "#ffffff", "theme_color": "#006AA7",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

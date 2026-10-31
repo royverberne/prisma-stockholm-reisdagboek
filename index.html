@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#006AA7">
+<link rel="icon" type="image/png" href="favicon-64.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="POP Stockholm">
 <title>Studiereis Stockholm – Persoonlijk ontwikkelplan</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
 <style>
@@ -833,6 +840,7 @@ $("#importFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new
 
 /* ---------- init ---------- */
 function renderAll(){renderHero();renderProgram();renderGoals();renderMap();renderSchools();renderNotes();renderOutputs();renderVoorNa();applyBindings();renderStats();lockAll()}
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 buildNav();renderAll();showTab("reis");setSync("idle");
 $("#showEat").addEventListener("change",renderMap);
 setInterval(renderHero,6e4*30);
