@@ -833,9 +833,13 @@ else{$("#mic").onclick=()=>{
 
 /* ---------- outputs ---------- */
 function renderOutputs(){
-  $("#outputs").innerHTML=[1,2].map(g=>`
+  // Kijkers zien alleen opbrengsten waar al iets in staat.
+  const filled=o=>{const d=S.out[o.id]||{};return (d.status&&d.status!==STATUS[0])||(d.text&&d.text.trim())||d.quick};
+  const vis=o=>isEd()||filled(o);
+  if(!isEd()&&!OUTS.some(filled)){$("#outputs").innerHTML='<p class="muted">De opbrengsten verschijnen hier zodra ze zijn uitgewerkt.</p>';renderOutStats();return}
+  $("#outputs").innerHTML=[1,2].filter(g=>OUTS.some(o=>o.g===g&&vis(o))).map(g=>`
    <h3 style="margin-top:22px"><span class="kicker">${GOALS[g].n}</span> · ${esc(GOALS[g].title)}</h3>
-   <div class="grid g2">${OUTS.filter(o=>o.g===g).map(o=>{const d=S.out[o.id]||{};return `
+   <div class="grid g2">${OUTS.filter(o=>o.g===g&&vis(o)).map(o=>{const d=S.out[o.id]||{};return `
     <div class="out ${d.quick?"quick":""}">
       <b style="color:var(--indigo)">${esc(o.t)}</b>
       <label>Status</label>
