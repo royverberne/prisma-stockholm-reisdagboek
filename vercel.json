@@ -1,0 +1,6 @@
+{
+  "headers": [
+    { "source": "/(.*)", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
+    { "source": "/og-image.jpg", "headers": [{ "key": "X-Robots-Tag", "value": "all" }] }
+  ]
+}
