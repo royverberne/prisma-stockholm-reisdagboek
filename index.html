@@ -412,7 +412,7 @@ function ensureSeed(s){
     s.seed2=true;
   }
   SEED.forEach(d=>{const x=s.schools.find(y=>y.id===d.id);if(x&&x.lat==null){x.lat=d.lat;x.lng=d.lng;if(!x.addr)x.addr=d.addr}});
-  Object.keys(QUESTIONS).forEach(id=>{const x=s.schools.find(y=>y.id===id);if(x&&!x.vragen)x.vragen=QUESTIONS[id]});
+  Object.keys(QUESTIONS).forEach(id=>{const x=s.schools.find(y=>y.id===id);if(x)x.vragen=QUESTIONS[id]});
   return s;
 }
 function load(){if(isEd()){try{const r=JSON.parse(localStorage.getItem(KEY));if(r)return ensureSeed(Object.assign(blank(),r))}catch(e){}}return ensureSeed(blank())}
