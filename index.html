@@ -125,6 +125,7 @@ dialog{border:0;border-radius:20px;padding:0;width:min(720px,94vw);max-height:92
 dialog::backdrop{background:rgba(30,30,70,.55)}
 .dlg{padding:22px;overflow:auto;max-height:92vh}
 .photo{width:100%;max-height:300px;object-fit:cover;border-radius:12px;margin-top:8px}
+.daysum details{margin:0 0 10px}.daysum summary{cursor:pointer;font-weight:800;color:var(--indigo)}.daysum h4{margin:12px 0 4px}.daysum ul{margin:0 0 6px;padding-left:20px}
 .pfig{margin:0 0 10px}.pfig input{margin-top:6px}.pfig button{margin-top:6px}
 .rate button{font-size:1.6rem;background:none;border:0;cursor:pointer;color:#ccc;padding:0 2px}
 .rate button.on{color:var(--yellow)}
@@ -258,6 +259,10 @@ dialog::backdrop{background:rgba(30,30,70,.55)}
     <h3 style="margin:0">Mijn notities</h3>
     <select id="nFilter" style="width:auto"><option value="">Alle</option><option value="1">Doel 1</option><option value="2">Doel 2</option></select>
   </div>
+  <div class="card edit-only" style="margin-top:18px">
+    <button class="btn" id="verwerk" type="button">Verwerk mijn notities</button>
+    <p class="muted" id="verwerkMsg" style="margin:8px 0 0"></p>
+  </div>
   <div id="noteList"></div>
 </section>
 
@@ -269,6 +274,7 @@ dialog::backdrop{background:rgba(30,30,70,.55)}
     <b id="qwCount">⚡ 0 van minimaal 2 quick wins gemarkeerd</b>
     <div class="bar"><i id="qwBar"></i></div>
   </div>
+  <div id="daySum"></div>
   <div id="outputs"></div>
 
   <h2 style="margin-top:30px">Na de reis: 30 · 60 · 90 dagen</h2>
@@ -765,6 +771,22 @@ $("#addSchool").onclick=()=>{const s={id:uid(),name:"",district:"norrmalm",date:
 $("#clearDemo").onclick=()=>{S.schools=S.schools.filter(s=>!s.demo);S.notes=S.notes.filter(n=>!n.demo);save();renderAll()};
 
 /* ---------- notes ---------- */
+let SUM=null;
+const fmtD=iso=>new Date(iso).toLocaleDateString("nl-NL",{weekday:"long",day:"numeric",month:"long"});
+async function loadSum(){try{const r=await fetch("summary.json",{cache:"no-store"});if(r.ok)SUM=await r.json()}catch(e){}renderSum();renderVerzoek()}
+function renderSum(){
+  const el=$("#daySum");if(!el)return;
+  const days=((SUM&&SUM.dagen)||[]).slice().sort((a,b)=>b.datum.localeCompare(a.datum));
+  if(!days.length){el.innerHTML="";return}
+  const list=(t,a)=>a&&a.length?`<h4>${t}</h4><ul>${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"";
+  el.innerHTML=`<h2 style="margin-top:6px">Samenvatting per dag</h2><div class="daysum">${days.map((d,i)=>`<div class="card"><details ${i===0?"open":""}><summary>${esc(fmtD(d.datum))}</summary>${d.kort?`<p>${esc(d.kort)}</p>`:""}${list("Doel 1 · Digitaal & AI",d.doel1)}${list("Doel 2 · Eigenaarschap",d.doel2)}${list("Overig",d.algemeen)}${list("Aandachtspunten voor morgen",d.aandacht)}</details></div>`).join("")}</div>`;
+}
+function renderVerzoek(){
+  const m=$("#verwerkMsg");if(!m)return;
+  const v=S.verzoek,u=SUM&&SUM.updated?new Date(SUM.updated).getTime():0;
+  const t=x=>new Date(x).toLocaleString("nl-NL",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+  m.textContent=v&&v>u?"Verzoek staat klaar ("+t(v)+"). Claude verwerkt het om 17.00 uur of zodra je het in de chat vraagt. De samenvatting verschijnt onder Opbrengst.":u?"Laatst verwerkt: "+t(u)+". Je vindt de samenvatting onder Opbrengst.":"Zet je notities klaar voor een samenvatting per doel. Die verschijnt onder Opbrengst.";
+}
 function renderNotes(){
   const f=$("#nFilter").value;
   const list=S.notes.slice().sort((a,b)=>b.ts-a.ts).filter(n=>!f||n.goal===f||n.goal==="both");
@@ -778,6 +800,7 @@ $("#nSave").onclick=()=>{
   $("#nText").value="";save();renderNotes();renderStats();
 };
 $("#nFilter").onchange=renderNotes;
+$("#verwerk").onclick=()=>{S.verzoek=Date.now();save();renderVerzoek()};
 document.addEventListener("click",e=>{const b=e.target.closest("[data-del]");if(b){S.notes=S.notes.filter(n=>n.id!==b.dataset.del);save();renderNotes();renderStats();renderSchools()}});
 $("#fab").onclick=()=>{showTab("dagboek");setTimeout(()=>$("#nText").focus(),300)};
 
@@ -849,7 +872,7 @@ $("#exportBtn").onclick=()=>{const a=document.createElement("a");a.href=URL.crea
 $("#importFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{S=ensureSeed(Object.assign(blank(),JSON.parse(r.result)));save();renderAll();$("#shareMsg").textContent="Back-up teruggezet."}catch(x){$("#shareMsg").textContent="Dit bestand kan ik niet lezen."}};r.readAsText(f)};
 
 /* ---------- init ---------- */
-function renderAll(){renderHero();renderProgram();renderGoals();renderMap();renderSchools();renderNotes();renderOutputs();renderVoorNa();applyBindings();renderStats();lockAll()}
+function renderAll(){renderHero();renderProgram();renderGoals();renderMap();renderSchools();renderNotes();renderOutputs();renderSum();renderVerzoek();renderVoorNa();applyBindings();renderStats();lockAll()}
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 buildNav();renderAll();showTab("reis");setSync("idle");
 $("#showEat").addEventListener("change",renderMap);
@@ -875,6 +898,7 @@ $("#loginPw").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin()});
 $("#logoutLink").onclick=e=>{e.preventDefault();try{localStorage.removeItem(KEYPW)}catch(x){}location.reload()};
 
 /* ---------- gegevens van de server ---------- */
+loadSum();
 (async()=>{
   const ok=await loadServer(false);
   if(ok){renderAll()}
@@ -883,7 +907,7 @@ $("#logoutLink").onclick=e=>{e.preventDefault();try{localStorage.removeItem(KEYP
 document.addEventListener("visibilitychange",()=>{
   if(document.hidden||isEd())return;
   const old=ETAG;
-  loadServer(false).then(()=>{if(ETAG!==old&&!$("#dlg").open)renderAll()});
+  loadServer(false).then(()=>{if(ETAG!==old&&!$("#dlg").open)renderAll()});loadSum();
 });
 })();
 </script>
