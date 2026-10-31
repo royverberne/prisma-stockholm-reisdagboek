@@ -178,7 +178,7 @@ dialog::backdrop{background:rgba(30,30,70,.55)}
 <div class="wrap heroarea">
     <div class="hero">
       <h1>Studiereis Stockholm Erasmus+</h1>
-      <p class="sub">Persoonlijk ontwikkelplan van <b>Meester Roy</b> &nbsp;·&nbsp; <span id="heroDates">november 2026</span> <span id="modeInfo" class="modeinfo"></span></p>
+      <p class="sub">Persoonlijk ontwikkelplan van <b style="white-space:nowrap">Roy Verberne</b><br><span id="heroDates" style="white-space:nowrap">november 2026</span> <span id="modeInfo" class="modeinfo"></span></p>
     </div>
     <nav class="tabs" id="tabsTop"></nav>
 </div>
@@ -848,7 +848,7 @@ function renderVoorNa(){
 
 /* ---------- export ---------- */
 function report(){
-  let t="STUDIEREIS STOCKHOLM ERASMUS+ · MEESTER ROY\n"+(GROUPS[S.group]?GROUPS[S.group].label:"november 2026")+"\n\n";
+  let t="STUDIEREIS STOCKHOLM ERASMUS+ · ROY VERBERNE\n"+(GROUPS[S.group]?GROUPS[S.group].label:"november 2026")+"\n\n";
   [1,2].forEach(g=>{
     t+="== "+GOALS[g].n+": "+GOALS[g].title+" ==\nLeerdoel: "+GOALS[g].smart+"\n";
     const e=(S.exp||{})["d"+g]||{};
@@ -881,7 +881,7 @@ setInterval(renderHero,6e4*30);
 /* ---------- inloggen / uitloggen ---------- */
 $("#loginLink").style.display=isEd()?"none":"";
 $("#logoutLink").style.display=isEd()?"":"none";
-$("#footTxt").textContent=isEd()?"Je bewerkt je plan. Wijzigingen worden automatisch opgeslagen.":"Persoonlijk ontwikkelplan van Meester Roy · alleen-lezen weergave.";
+$("#footTxt").textContent=isEd()?"Je bewerkt je plan. Wijzigingen worden automatisch opgeslagen.":"Persoonlijk ontwikkelplan van Roy Verberne · alleen-lezen weergave.";
 $("#loginLink").onclick=e=>{e.preventDefault();$("#loginMsg").textContent="";$("#loginPw").value="";$("#loginDlg").showModal();setTimeout(()=>$("#loginPw").focus(),50)};
 $("#loginCancel").onclick=()=>$("#loginDlg").close();
 const doLogin=async()=>{

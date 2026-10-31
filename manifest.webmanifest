@@ -1,7 +1,7 @@
 {
   "name": "POP Stockholm",
   "short_name": "POP Stockholm",
-  "description": "Persoonlijk ontwikkelplan van Meester Roy voor de Prisma Erasmus+ studiereis naar Stockholm.",
+  "description": "Persoonlijk ontwikkelplan van Roy Verberne voor de Prisma Erasmus+ studiereis naar Stockholm.",
   "lang": "nl", "start_url": "./", "scope": "./", "display": "standalone",
   "background_color": "#ffffff", "theme_color": "#006AA7",
   "icons": [
