@@ -135,9 +135,9 @@ dialog::backdrop{background:rgba(30,30,70,.55)}
 .footline .l{flex:1;height:2px;background:#0A8FCF;margin-top:calc(var(--ih)*0.4409 - 1px)}
 .footline img{height:var(--ih);width:auto;display:block;flex:none}
 .slogan{display:block;width:210px;max-width:60%;margin:22px 0 0}
-.foot{padding:8px 0 24px;color:#777;font-size:.85rem}
+.foot{padding:8px 18px 24px;color:#777;font-size:.85rem}
 
-.fab{position:fixed;left:0;right:0;margin-inline:auto;width:max-content;bottom:92px;z-index:20;border-radius:99px;padding:14px 22px;box-shadow:0 8px 20px rgba(198,0,111,.35);font-size:1rem}
+.fab{position:fixed;right:18px;bottom:92px;z-index:20;border-radius:99px;padding:14px 22px;box-shadow:0 8px 20px rgba(198,0,111,.35);font-size:1rem}
 
 @media (max-width:760px){
   nav.tabs{display:none}
@@ -149,7 +149,7 @@ dialog::backdrop{background:rgba(30,30,70,.55)}
   .clip{width:104px;right:12px}
   .hero{padding-right:70px}
   .footline{--ih:36px}
-  .fab{bottom:80px}
+  .fab{bottom:80px;left:0;right:0;margin-inline:auto;width:max-content}
 }
 @media print{
   nav,.fab,.btn,.footline,.noprint{display:none!important}
@@ -255,13 +255,13 @@ dialog::backdrop{background:rgba(30,30,70,.55)}
     <div class="row" style="margin-top:14px"><button class="btn" id="nSave">Opslaan</button></div>
   </div>
 
+  <div class="card edit-only" style="margin-top:18px;margin-bottom:6px">
+    <button class="btn" id="verwerk" type="button">Verwerk mijn notities</button>
+    <p class="muted" id="verwerkMsg" style="margin:8px 0 0"></p>
+  </div>
   <div class="row" style="margin:22px 0 4px">
     <h3 style="margin:0">Mijn notities</h3>
     <select id="nFilter" style="width:auto"><option value="">Alle</option><option value="1">Doel 1</option><option value="2">Doel 2</option></select>
-  </div>
-  <div class="card edit-only" style="margin-top:18px">
-    <button class="btn" id="verwerk" type="button">Verwerk mijn notities</button>
-    <p class="muted" id="verwerkMsg" style="margin:8px 0 0"></p>
   </div>
   <div id="noteList"></div>
 </section>
@@ -344,7 +344,7 @@ const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;"
 const GOALS={
  1:{n:"Doel 1",title:"Geïntegreerde digitale geletterdheid & praktische AI-toepassing",pijler:"Digitale geletterdheid & AI",chips:["Digitaal differentiëren","Quick wins"],cls:"accent",
   ctx:"In het Zweedse curriculum (Lgr22) is digitale geletterdheid (computational thinking, programmeren, bronnenkritiek/källkritik) geen losstaand vak, maar verweven in kernvakken als rekenen/wiskunde en Wetenschap & Techniek. Scholen zoeken naar de juiste balans met generatieve AI, binnen strenge AVG-kaders.",
-  smart:"Ik onderzoek tijdens de schoolbezoeken in Stockholm hoe leerkrachten en ICT-coördinatoren digitale geletterdheid en AI-tools structureel integreren in de reguliere kernvakken (zoals rekenen en taal en Wetenschap & Techniek), en breng specifiek in kaart hoe zowel de leerkracht (werkdrukverlaging en differentiatie) als de leerling (binnen veilige kaders) hier actief mee werkt.",
+  smart:"Ik onderzoek tijdens de schoolbezoeken in Stockholm hoe leerkrachten en ICT-coördinatoren digitale geletterdheid en AI-tools structureel integreren in de reguliere kernvakken (zoals rekenen, taal en Wetenschap & Techniek), en breng specifiek in kaart hoe zowel de leerkracht (werkdrukverlaging en differentiatie) als de leerling (binnen veilige kaders) hier actief mee werkt.",
   opbr:["3 direct toepasbare voorbeelden om digitale geletterdheid en AI te koppelen aan onze reken- en zaakvaklessen, zonder dat het een 'extra vak' voelt.","Een concreet beleidsvoorstel voor veilig en didactisch verantwoord werken met AI binnen Stichting Prisma."],
   vragen:["Hoe verweven leraren digitale geletterdheid (computational thinking, programmeren, källkritik) in rekenen en Wetenschap & Techniek?","Welke AI-tools gebruikt de leerkracht voor voorbereiding en differentiatie, en wat scheelt dat in werkdruk?","Hoe werken 10–12-jarigen zelf met AI en digitale tools, en welke AVG-kaders en afspraken gelden?","Welke rol heeft de ICT-coördinator, en hoe bewaken ze dat het didactisch verantwoord blijft?"]},
  2:{n:"Doel 2",title:"Eigenaarschap & executieve functies in een doorlopende leerlijn",pijler:"Praktijk groep 8",chips:["Inclusiever lesgeven","Quick wins"],cls:"accent2",
