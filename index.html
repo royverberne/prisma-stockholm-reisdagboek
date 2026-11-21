@@ -833,7 +833,7 @@ function renderVerzoek(){
   const m=$("#verwerkMsg");if(!m)return;
   const v=S.verzoek,u=SUM&&SUM.updated?new Date(SUM.updated).getTime():0;
   const fm=x=>new Date(x).toLocaleString(LOC(),{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
-  m.textContent=v&&v>u?tr("Verzoek staat klaar ("+fm(v)+"). Claude verwerkt het om 17.00 uur of zodra je het in de chat vraagt. De samenvatting verschijnt onder Opbrengst.","Request is ready ("+fm(v)+"). Claude processes it at 17.00 or as soon as you ask in the chat. The summary appears under Outcomes."):u?tr("Laatst verwerkt: "+fm(u)+". Je vindt de samenvatting onder Opbrengst.","Last processed: "+fm(u)+". You will find the summary under Outcomes."):tr("Zet je notities klaar voor een samenvatting per doel. Die verschijnt onder Opbrengst.","Queue your notes for a summary per goal. It appears under Outcomes.");
+  m.textContent=v&&v>u?tr("Verzoek staat klaar ("+fm(v)+"). Vraag Claude in de chat om het te verwerken. De samenvatting verschijnt onder Opbrengst.","Request is ready ("+fm(v)+"). Ask Claude in the chat to process it. The summary appears under Outcomes."):u?tr("Laatst verwerkt: "+fm(u)+". Je vindt de samenvatting onder Opbrengst.","Last processed: "+fm(u)+". You will find the summary under Outcomes."):tr("Zet je notities klaar voor een samenvatting per doel. Die verschijnt onder Opbrengst.","Queue your notes for a summary per goal. It appears under Outcomes.");
 }
 function renderNotes(){
   const f=$("#nFilter").value;
