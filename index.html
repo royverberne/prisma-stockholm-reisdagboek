@@ -183,6 +183,11 @@ dialog::backdrop{background:rgba(30,30,70,.55)}
 @media print{
   body>*:not(.printdoc){display:none!important}
   .printdoc{display:block;font-size:10.5pt;line-height:1.4;color:#1c2540}
+  .printdoc{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .printdoc header.top{display:block;padding:0 0 10px;margin-bottom:14px}
+  .printdoc header.top .hdr{min-height:78px}
+  .printdoc .logo{height:56px}
+  .printdoc .clipwrap{width:100px;right:6px;top:-4px}
   .printdoc h1{font-size:20pt;margin:0 0 2px;color:#143057}
   .printdoc h2{font-size:14pt;margin:18px 0 6px;padding-bottom:3px;border-bottom:2px solid #c2007a;color:#143057;break-after:avoid}
   .printdoc h3{font-size:11.5pt;margin:12px 0 3px;color:#143057;break-after:avoid}
@@ -943,7 +948,9 @@ function buildPrint(){
   const el=$("#printDoc");if(!el)return;
   const P=x=>x?`<p>${esc(x)}</p>`:"";
   const grp=GROUPS[S.group]?t(GROUPS[S.group].label):t("november 2026");
-  let h=`<h1>${t("Studiereis Stockholm – Persoonlijk ontwikkelplan")}</h1><p class="sub">Roy Verberne · ${tr("Stichting Prisma, Erasmus+","Stichting Prisma, Erasmus+")} · ${grp}</p>`;
+  const hd=$("header.top");let ban="";
+  if(hd){const c=hd.cloneNode(true);const sw=c.querySelector("#langSw");if(sw)sw.remove();ban=c.outerHTML.replace(/fsh/g,"fshp").replace(/ id="[^"]*"/g,m=>m.indexOf("fshp")>-1?m:"")}
+  let h=ban+`<h1>${t("Studiereis Stockholm – Persoonlijk ontwikkelplan")}</h1><p class="sub">Roy Verberne · ${tr("Stichting Prisma, Erasmus+","Stichting Prisma, Erasmus+")} · ${grp}</p>`;
   [1,2].forEach(g=>{
     const G=GOALS[g],e=(S.exp||{})["d"+g]||{};
     h+=`<h2>${t(G.n)}: ${t(G.title)}</h2><h4>${tr("Leerdoel","Learning goal")}</h4>${P(t(G.smart))}`;
